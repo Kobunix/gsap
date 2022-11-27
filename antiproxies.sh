@@ -5,7 +5,7 @@
 # HOWEVER YOU NEED TO RESPECT THE AUTHOR OF THIS SCRIPT
 # KEEP CREDITS AND MENTION THE USE OF THE SCRIPT
 #
-# Created by Kobunix <help@rootwork.eu>
+# Created by Kobunix <kobunix@rootwork.eu>
 #
 
 # ================================================================
