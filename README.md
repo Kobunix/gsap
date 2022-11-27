@@ -21,4 +21,4 @@ And remove the script : **`rm antiproxies.sh`**
 
 
 ### Respect my work and credit me if you use it.
-### Contact me as needed : kobunix@rootwork.eu
+### Contact me as needed : kobunix@gmail.com
