@@ -21,7 +21,7 @@ Cyan='\033[0;36m'
 White='\033[0;37m'
 
 
-BASE_APPS='curl ipset iptables iptables-persistent'
+BASE_APPS='curl ipset iptables iptables-persistent ip6tables'
 # ================================================================
 
 clear
@@ -34,8 +34,8 @@ Error () {
 	echo "${Green}#${WHITE}    --uninstall       Uninstall GSAP\t\t\t\t\t    ${Green}#"
 	echo "${Green}#${WHITE}    --updatetor       Update tor Exit nodes\t\t\t            ${Green}#"
 	echo "${Green}#                                                                           #"
-	echo "${Green}#${WHITE}    tor4              Apply tor network ban\t\t\t            ${Green}#"
-	echo "${Green}#${WHITE}    tor6              Apply tor network ban\t\t\t            ${Green}#"
+	echo "${Green}#${WHITE}    tor4              Apply tor network ban    [$(ipset list tornetv4 | grep "Number of entries:")]   ${Green}#"
+	echo "${Green}#${WHITE}    tor6              Apply tor network ban    [$(ipset list tornetv6 | grep "Number of entries:")]   ${Green}#"
 	echo "${Green}#${WHITE}    hostings          Apply hostings ban\t\t\t            ${Green}#"
 	echo "${Green}#                                                                           #"
 	echo "${Green}=============================================================================${NC}"
@@ -146,7 +146,7 @@ else
 	    elif [ "$1" = "tor6" ]; then
 
 	    	echo "${RED}[tor6] ${WHITE}Applying rules for ipv6 ${NC}"
-			iptables -A INPUT -m set --match-set tornetv6 src -j DROP
+			ip6tables -A INPUT -m set --match-set tornetv6 src -j DROP
 
 	    elif [ "$1" = "hostings" ]; then
 			echo "filled hostings"
@@ -157,3 +157,5 @@ else
 	fi
 	echo " "
 fi
+
+# End of the script
