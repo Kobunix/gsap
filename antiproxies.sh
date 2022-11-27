@@ -27,11 +27,7 @@ BASE_APPS='curl ipset iptables iptables-persistent'
 clear
 
 Error () {
-	
-	# echo "${RED}[Error] ${WHITE}Please choose a valid method : $0 <tor/hostings>${NC}"
-	# echo "${Green}#                                                                           #"
 	echo "${Green}#                            [Available Options]                            #"
-	# echo "${Green}#                                                                           #"
 	echo "${Green}============================================================================="
 	echo "${Green}#                                                                           #${NC}"
 	echo "${Green}#${WHITE}    --install         Install the needed packages\t\t\t    ${Green}#"
@@ -45,13 +41,27 @@ Error () {
 	echo "${Green}=============================================================================${NC}"
 }
 
+
+# ----------------------------------------------------------------------------------------------------
+# @Uninstall 
+# ----------------------------------------------------------------------------------------------------
 UninstallGSAP () {
 
 	echo "${RED}[Uninstall] ${WHITE}Uninstalling ipset rules. ${NC}"
+	
+	ipset flush tornetv4 > /dev/null 2>&1
+	ipset flush tornetv6 > /dev/null 2>&1
+	ipset flush common > /dev/null 2>&1
+
 	ipset destroy tornetv4 > /dev/null 2>&1
 	ipset destroy tornetv6 > /dev/null 2>&1
+	ipset destroy common > /dev/null 2>&1
 
 }
+
+# ----------------------------------------------------------------------------------------------------
+# @TorNetwork Functions
+# ----------------------------------------------------------------------------------------------------
 
 TOR_Rules () {
 	iptables -A INPUT -m set --match-set tornet src -j DROP
@@ -67,6 +77,10 @@ TOR_Update_IPV6 () {
 	curl 'https://lists.fissionrelays.net/tor/relays-ipv6.txt' | xargs -n 1 ipset -A tornetv6 > /dev/null 2>&1
 }
 
+# ----------------------------------------------------------------------------------------------------
+# @Prereqs 
+# ----------------------------------------------------------------------------------------------------
+
 Install_Prereqs () {
 	echo "${RED}[Install] ${WHITE}Checking for system updates ${NC}"
 	apt-get update > /dev/null 2>&1
@@ -78,9 +92,14 @@ Install_Prereqs () {
 	echo "${RED}[Install] ${WHITE}Creating ipset entry : tornetv4 ${NC}"
 	ipset create tornetv4 iphash
 	echo "${RED}[Install] ${WHITE}Creating ipset entry : tornetv6 ${NC}"
-	ipset create tornetv6 iphash
+	ipset create tornetv6 hash:net family inet6
+	echo "${RED}[Install] ${WHITE}Creating ipset entry : common ${NC}"
+	ipset create common iphash
 }
 
+# ----------------------------------------------------------------------------------------------------
+# @Header
+# ----------------------------------------------------------------------------------------------------
 Header () {
 	echo "${Green}=============================================================================${NC}"
 	echo "${Green}#${RED}      ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄               ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄      ${Green}#"
@@ -101,8 +120,6 @@ Header () {
 	echo "${Green}=============================================================================${NC}"
 }
 
-
-
 if [ -z "$1" ]; then
 	Header
 	Error
@@ -122,15 +139,14 @@ else
 
 	else
 		if [ "$1" = "tor4" ]; then
-			echo "${RED}[tor4] ${WHITE}Updating list ${NC}"
-			TOR_Update_IPV4 > /dev/null 2>&1
-			sleep 3
-			echo "${RED}[tor4] ${WHITE}Applying rules ${NC}"
+			
+			echo "${RED}[tor4] ${WHITE}Applying rules for ipv4 ${NC}"
 			iptables -A INPUT -m set --match-set tornetv4 src -j DROP
 
 	    elif [ "$1" = "tor6" ]; then
 
-	    	echo "filled tor"
+	    	echo "${RED}[tor6] ${WHITE}Applying rules for ipv6 ${NC}"
+			iptables -A INPUT -m set --match-set tornetv6 src -j DROP
 
 	    elif [ "$1" = "hostings" ]; then
 			echo "filled hostings"
